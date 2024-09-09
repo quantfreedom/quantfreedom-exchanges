@@ -31,7 +31,7 @@ public class MufexCancelersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/cancel",
+            requestUrl: "/private/v1/trade/cancel",
             httpMethod: HttpMethod.Post,
             query: query
             );
@@ -50,7 +50,7 @@ public class MufexCancelersService
         };
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/cancel-all",
+            requestUrl: "/private/v1/trade/cancel-all",
             httpMethod: HttpMethod.Post,
             query: query
             );

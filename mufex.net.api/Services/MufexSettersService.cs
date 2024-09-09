@@ -36,7 +36,7 @@ public class MufexSettersService
 
 
         var result = await this.apiService.SendSignedAsync<string>(
-                requestUri: "/private/v1/account/set-leverage",
+                requestUrl: "/private/v1/account/set-leverage",
                 httpMethod: HttpMethod.Post,
                 query: query
         );
@@ -76,7 +76,7 @@ public class MufexSettersService
 
 
         var result = await this.apiService.SendSignedAsync<string>(
-                requestUri: "/private/v1/account/set-isolated",
+                requestUrl: "/private/v1/account/set-isolated",
                 httpMethod: HttpMethod.Post,
                 query: query
         );

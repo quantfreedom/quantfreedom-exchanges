@@ -35,7 +35,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/account/balance",
+            requestUrl: "/private/v1/account/balance",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -60,7 +60,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/account/trade-fee",
+            requestUrl: "/private/v1/account/trade-fee",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -89,7 +89,7 @@ public class MufexGettersService
         };
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/public/v1/position-risk",
+            requestUrl: "/public/v1/position-risk",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -123,7 +123,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/account/positions",
+            requestUrl: "/private/v1/account/positions",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -167,7 +167,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/fills",
+            requestUrl: "/private/v1/trade/fills",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -206,7 +206,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/account/closed-pnl",
+            requestUrl: "/private/v1/account/closed-pnl",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -262,7 +262,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/account/bills",
+            requestUrl: "/private/v1/account/bills",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -296,7 +296,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/public/v1/instruments",
+            requestUrl: "/public/v1/instruments",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -354,7 +354,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/orders",
+            requestUrl: "/private/v1/trade/orders",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -393,7 +393,7 @@ public class MufexGettersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/activity-orders",
+            requestUrl: "/private/v1/trade/activity-orders",
             httpMethod: HttpMethod.Get,
             query: query
             );
@@ -456,7 +456,7 @@ public class MufexGettersService
         };
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/public/v1/market/kline",
+            requestUrl: "/public/v1/market/kline",
             httpMethod: HttpMethod.Get,
             query: query
             );

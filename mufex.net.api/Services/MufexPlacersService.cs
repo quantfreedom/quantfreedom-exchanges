@@ -90,7 +90,7 @@ public class MufexPlacersService
             ("closeOnTrigger", closeOnTrigger)
         );
         var result = await apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/create",
+            requestUrl: "/private/v1/trade/create",
             httpMethod: HttpMethod.Post,
             query: query
             );

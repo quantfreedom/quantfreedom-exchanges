@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Exchanges.Services.Interfaces;
 using Exchanges.Utils;
 using Exchnages.Utils;
@@ -7,39 +8,39 @@ using Newtonsoft.Json;
 
 namespace Exchanges.Mufex;
 
-public class Mufex : Exchange
+public class Mufex
 {
     private readonly IConfiguration _configuration;
-
+    private readonly IApiService _apiService;
     public Mufex(
         IConfiguration configuration,
         IApiService apiService
-    ) : base(apiService, "https://api.mufex.finance", "MF-ACCESS-SIGN")
+    )
     {
         _configuration = configuration;
+        _apiService = apiService;
     }
-    protected override Dictionary<string, string> BuildRequestHeaders(string currentTimeStamp, bool includeApiKey)
+    private Dictionary<string, string> BuildRequestHeaders(string currentTimeStamp, bool includeApiKey)
     {
-        var apiKey = _configuration["Exchange:ApiKey"];
-        var recvWindow = _configuration["RecvWindow"];
-
         var headers = new Dictionary<string, string>
         {
             { "MF-ACCESS-SIGN-TYPE", ExchangeConstants.DEFAULT_SIGN_TYPE },
             { "MF-ACCESS-TIMESTAMP", currentTimeStamp },
-            { "MF-ACCESS-RECV-WINDOW", recvWindow },
+            { "MF-ACCESS-RECV-WINDOW", _configuration["RecvWindow"] },
             { "X-Referer", "AKF3CWKDT" }
         };
 
         if (includeApiKey)
         {
-            headers.Add("MF-ACCESS-API-KEY", apiKey);
+            headers.Add("MF-ACCESS-API-KEY", _configuration["Mufex:ApiKey"]);
         }
         return headers;
     }
 
     public async Task<List<GetWalletBalanceDataList>?> GetAccountBalance(string? coin = null)
     {
+        var endpoint = "/private/v1/account/balance";
+        
         var query = new Dictionary<string, object>();
 
         ExchangeUtils.AddOptionalParameters(
@@ -47,9 +48,15 @@ public class Mufex : Exchange
             ("coin", coin)
         );
 
-        var response = await this.GetAccountBalance<string>(
-            requestUrl: "/private/v1/account/balance",
-            query: query
+        var currentTimeStamp = ExchangeUtils.GetCurrentTimeStampString();
+        var headers = BuildRequestHeaders(currentTimeStamp, true);
+
+        var response = await _apiService.SendSignedGetAsync<string>(
+            requestUrl: endpoint,
+            query: query,
+            signatureHeaderName: _configuration["Mufex:SignatureHeaderName"],
+            currentTimeStamp: currentTimeStamp,
+            headers: headers
             );
         var generalResponse = JsonConvert.DeserializeObject<GeneralResponse<GetWalletBalanceData>>(response);
         var responseList = generalResponse.data.list;

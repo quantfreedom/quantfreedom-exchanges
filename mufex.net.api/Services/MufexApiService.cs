@@ -35,7 +35,7 @@ public class MufexApiService
     }
 
     public async Task<T?> SendSignedAsync<T>(
-        string requestUri,
+        string requestUrl,
         HttpMethod httpMethod,
         Dictionary<string, object>? query = null
         )
@@ -51,7 +51,7 @@ public class MufexApiService
             {
                 queryString = GenerateQueryString(query);
             }
-            requestUri = queryString.Length > 0 ? requestUri + "?" + queryString : requestUri;
+            requestUrl = queryString.Length > 0 ? requestUrl + "?" + queryString : requestUrl;
         }
         else if (httpMethod == HttpMethod.Post)
         {
@@ -76,7 +76,7 @@ public class MufexApiService
         }
 
         var result = await SendAsync<T>(
-            requestUri: requestUri,
+            requestUrl: requestUrl,
             httpMethod: httpMethod,
             signature: signature,
             postString: postString
@@ -92,13 +92,13 @@ public class MufexApiService
     }
 
     private async Task<T?> SendAsync<T>(
-        string requestUri,
+        string requestUrl,
         HttpMethod httpMethod,
         string? signature = null,
         string? postString = null
         )
     {
-        HttpRequestMessage request = BuildHttpRequest(requestUri, httpMethod, signature, postString);
+        HttpRequestMessage request = BuildHttpRequest(requestUrl, httpMethod, signature, postString);
 
         LogHttpRequestHeader(request);
 
@@ -125,7 +125,7 @@ public class MufexApiService
                 }
                 catch (JsonReaderException ex)
                 {
-                    var clientException = new MufexClientException($"Failed to map server response from '{requestUri}' to given type", -1, ex)
+                    var clientException = new MufexClientException($"Failed to map server response from '{requestUrl}' to given type", -1, ex)
                     {
                         StatusCode = (int)response.StatusCode,
                         Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value)
@@ -196,19 +196,19 @@ public class MufexApiService
     /// <summary>
     /// Build http request add attributes to header
     /// </summary>
-    /// <param name="requestUri">The URI of the endpoint to request.</param>
+    /// <param name="requestUrl">The URI of the endpoint to request.</param>
     /// <param name="httpMethod">The HTTP method (GET, POST, etc.) of the request.</param>
     /// <param name="signature">Optional signature for authentication.</param>
     /// <param name="content">Optional content to include in the request body.</param>
     /// <returns>Http Request message</returns>
     private HttpRequestMessage BuildHttpRequest(
-        string requestUri,
+        string requestUrl,
         HttpMethod httpMethod,
         string? signature,
         string? postString
         )
     {
-        var theUrl = this.baseUrl + requestUri;
+        var theUrl = this.baseUrl + requestUrl;
         HttpRequestMessage request = new(httpMethod, theUrl);
         request.Headers.Add("User-Agent", UserAgent);
         if (signature != null && signature.Length > 0)

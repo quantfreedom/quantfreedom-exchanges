@@ -47,7 +47,7 @@ public class MufexAdjustersService
         );
 
         var result = await this.apiService.SendSignedAsync<string>(
-            requestUri: "/private/v1/trade/replace",
+            requestUrl: "/private/v1/trade/replace",
             httpMethod: HttpMethod.Post,
             query: query
             );
