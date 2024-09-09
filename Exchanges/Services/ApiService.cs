@@ -77,8 +77,8 @@ public class ApiService : IApiService
 
     private string GenerateSignature(string queryString, string currentTimeStamp)
     {
-        var apiKey = _configuration["Mufex:ApiKey"];
-        var secretKey = _configuration["Mufex:SecretKey"];
+        var apiKey = _configuration["Exchange:ApiKey"];
+        var secretKey = _configuration["Exchange:SecretKey"];
         var recvWindow = _configuration["RecvWindow"];
 
         string rawData = currentTimeStamp + apiKey + recvWindow + queryString;
@@ -106,7 +106,7 @@ public class ApiService : IApiService
     {
         using var httpClient = new HttpClient();
 
-        HttpRequestMessage request = new(httpMethod, _configuration["Mufex:Mainnet"] + requestUrl);
+        HttpRequestMessage request = new(httpMethod, _configuration["Exchange:Mainnet"] + requestUrl);
         foreach (var header in headers)
         {
             request.Headers.Add(header.Key, header.Value);

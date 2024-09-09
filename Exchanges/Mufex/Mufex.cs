@@ -32,7 +32,7 @@ public class Mufex
 
         if (includeApiKey)
         {
-            headers.Add("MF-ACCESS-API-KEY", _configuration["Mufex:ApiKey"]);
+            headers.Add("MF-ACCESS-API-KEY", _configuration["Exchange:ApiKey"]);
         }
         return headers;
     }
@@ -40,7 +40,7 @@ public class Mufex
     public async Task<List<GetWalletBalanceDataList>?> GetAccountBalance(string? coin = null)
     {
         var endpoint = "/private/v1/account/balance";
-        
+
         var query = new Dictionary<string, object>();
 
         ExchangeUtils.AddOptionalParameters(
@@ -54,7 +54,7 @@ public class Mufex
         var response = await _apiService.SendSignedGetAsync<string>(
             requestUrl: endpoint,
             query: query,
-            signatureHeaderName: _configuration["Mufex:SignatureHeaderName"],
+            signatureHeaderName: _configuration["Exchange:SignatureHeaderName"],
             currentTimeStamp: currentTimeStamp,
             headers: headers
             );
