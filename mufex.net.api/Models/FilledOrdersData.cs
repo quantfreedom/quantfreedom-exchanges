@@ -6,7 +6,7 @@ public class FilledOrdersDataList
 {
 
     [JsonProperty("list")]
-    public List<FilledOrdersData>? list { get; set; }
+    public List<FilledOrdersData> list { get; set; }
 }
 
 public class FilledOrdersData

@@ -17,6 +17,22 @@ public static class MufexConstants
 
     public const string WEBSOCKET_PUBLIC_TESTNET = "wss://ws.mufex.finance/realtime_public";
     public const string WEBSOCKET_PRIVATE_TESTNET = "wss://ws.mufex.finance/contract/private";
-    // public static List<object> MufexConstants = new List<object> { 1, 5, 15, 30, 60, 120, 240, 360, 720, "D", "W" };
-    // public static readonly MufexConstants MufexConstants => new List<object> { 1, 5, 15, 30, 60, 120, 240, 360, 720, "D", "W" };
+
+    private static Dictionary<string, string> MUFEX_TIMEFRAMES = new Dictionary<string, string>
+    {
+        { "1m", "1" },
+        { "5m", "5" },
+        { "15m", "15" },
+        { "30m", "30" },
+        { "1h", "60" },
+        { "4h", "240" },
+        { "1d", "1440" },
+        { "1w", "10080" },
+        { "1M", "43200" }
+    };
+
+    public static string GetMufexTimeframe(string timeframe)
+    {
+        return MUFEX_TIMEFRAMES[timeframe];
+    }
 }

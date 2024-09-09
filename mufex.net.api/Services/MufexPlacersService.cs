@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using mufex.net.api.Models;
+using mufex.net.api.Utils;
 
 namespace mufex.net.api.Services;
 public class MufexPlacersService
@@ -76,7 +76,7 @@ public class MufexPlacersService
                             { "timeInForce", timeInForce.Value }
                         };
 
-        MufexParametersUtils.AddOptionalParameters(query,
+        MufexUtils.AddOptionalParameters(query,
             ("price", price.ToString()),
             ("triggerDirection", triggerDirection),
             ("triggerPrice", triggerPrice.ToString()),

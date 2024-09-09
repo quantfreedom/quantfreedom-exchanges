@@ -1,6 +1,7 @@
 using mufex.net.api.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using mufex.net.api.Utils;
 
 namespace mufex.net.api.Services;
 
@@ -36,7 +37,7 @@ public class MufexAdjustersService
             { "symbol", symbol }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("orderLinkID", orderLinkID),

@@ -1,4 +1,5 @@
 using mufex.net.api.Models;
+using mufex.net.api.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -67,7 +68,7 @@ public class MufexSettersService
             { "tradeMode", leverageMode.Value }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("buyLeverage", buyLeverage.ToString()),
             ("sellLeverage", sellLeverage.ToString())

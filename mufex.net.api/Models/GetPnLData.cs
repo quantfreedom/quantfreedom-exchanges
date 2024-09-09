@@ -3,9 +3,6 @@ using Newtonsoft.Json;
 namespace mufex.net.api.Models;
 public class GetPnLData
 {
-    /// <summary>
-    /// https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-balance
-    /// </summary>
 
     [JsonProperty("list")]
     public List<GetPnLDataList>? list { get; set; }
@@ -13,9 +10,6 @@ public class GetPnLData
 
 public class GetPnLDataList
 {
-    /// <summary>
-    /// https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-balance
-    /// </summary>
 
     public string? symbol { get; set; }
     public string? orderId { get; set; }

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace mufex.net.api.Models;
+namespace Exchanges.Mufex.Models;
 
 public class TradingFeeData
 {

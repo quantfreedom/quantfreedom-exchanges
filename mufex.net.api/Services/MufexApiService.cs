@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
+using mufex.net.api.Utils;
 
 namespace mufex.net.api.Services;
 
@@ -42,7 +43,7 @@ public class MufexApiService
         string? queryString = string.Empty;
         string? postString = null;
         string? signature = null;
-        this.CurrentTimeStamp = MufexParametersUtils.GetCurrentTimeStampString();
+        this.CurrentTimeStamp = MufexUtils.GetCurrentTimeStampString();
 
         if (httpMethod == HttpMethod.Get)
         {

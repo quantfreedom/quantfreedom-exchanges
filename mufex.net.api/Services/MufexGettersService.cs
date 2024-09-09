@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using mufex.net.api.Models;
 using Newtonsoft.Json.Linq;
+using mufex.net.api.Utils;
 
 namespace mufex.net.api.Services;
 
@@ -28,7 +29,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("coin", coin)
         );
@@ -53,7 +54,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("symbol", symbol)
         );
@@ -114,7 +115,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("settleCoin", settleCoin),
@@ -149,14 +150,14 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>{
             { "symbol", symbol }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("startTime", startTimeUtcTimestamp),
@@ -190,14 +191,14 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>{
             { "symbol", symbol }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("startTime", startTimeUtcTimestamp),
             ("endTime", endTimeUtcTimestamp),
@@ -246,12 +247,12 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexParametersUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>();
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("startTime", startTimeUtcTimestamp),
             ("endTime", endTimeUtcTimestamp),
@@ -288,7 +289,7 @@ public class MufexGettersService
             { "category", category }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("limit", limit)
@@ -343,7 +344,7 @@ public class MufexGettersService
             { "symbol", symbol }
         };
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("orderLinkID", orderLinkID),
@@ -381,7 +382,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexParametersUtils.AddOptionalParameters(
+        MufexUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("orderId", orderId),
@@ -440,5 +441,29 @@ public class MufexGettersService
         double assetSizeStep = jsonResultList.lotSizeFilter.qtyStep.Value;
         double priceStep = jsonResultList.priceFilter.tickSize.Value;
         return (minLev, maxLev, levStep, minAssetSize, maxAssetSize, assetSizeStep, priceStep);
+    }
+    public async Task<List<CandleDataParsed>> GetCandles(
+        string symbol = "BTCUSDT",
+        string timeframe = "5"
+    )
+    {
+        var query = new Dictionary<string, object>
+        {
+            { "symbol", symbol },
+            { "interval", timeframe },
+            { "limit", 1500 },
+            { "category", "linear" }
+        };
+
+        var result = await this.apiService.SendSignedAsync<string>(
+            requestUri: "/public/v1/market/kline",
+            httpMethod: HttpMethod.Get,
+            query: query
+            );
+        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<CandleData>>(result);
+        var messageResult = jsonResult.message;
+        var needsParsing = jsonResult.data;
+        var parsedData = MufexUtils.GetCandleParseModel(needsParsing);
+        return parsedData;
     }
 }
