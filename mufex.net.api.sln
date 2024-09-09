@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mufex.net.api", "mufex.net.api\mufex.net.api.csproj", "{372CF4B9-2967-42A6-976A-FD4D82DA526E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exchanges", "Exchanges\Exchanges.csproj", "{286ACC39-543E-4608-ADD5-90321846C548}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exchanges", "Exchanges\Exchanges.csproj", "{286ACC39-543E-4608-ADD5-90321846C548}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{956DAFAD-01A9-4089-96BC-6ED4383AA2D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{286ACC39-543E-4608-ADD5-90321846C548}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{286ACC39-543E-4608-ADD5-90321846C548}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{286ACC39-543E-4608-ADD5-90321846C548}.Release|Any CPU.Build.0 = Release|Any CPU
+		{956DAFAD-01A9-4089-96BC-6ED4383AA2D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{956DAFAD-01A9-4089-96BC-6ED4383AA2D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{956DAFAD-01A9-4089-96BC-6ED4383AA2D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{956DAFAD-01A9-4089-96BC-6ED4383AA2D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

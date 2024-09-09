@@ -1,9 +1,7 @@
-using System;
 using Exchanges.Utils;
 using Exchnages.Utils;
-using Exchanges.Mufex.Models;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Models.Mufex;
 
 namespace Exchanges.Mufex;
 
@@ -18,6 +16,7 @@ public class MufexGetters : Mufex
     ) : base(apiKey, secretKey, baseUrl, debugMode, recvWindow)
     {
     }
+
     public async Task<List<GetWalletBalanceDataList>?> GetAccountBalance(string? coin = null)
     {
         var query = new Dictionary<string, object>();

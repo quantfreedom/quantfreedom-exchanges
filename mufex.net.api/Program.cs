@@ -1,11 +1,15 @@
-﻿using System.Net.WebSockets;
-using System.Text;
+﻿using Microsoft.Extensions.Configuration;
 using mufex.net.api;
-using mufex.net.api.Models;
 using mufex.net.api.Services;
-using Newtonsoft.Json;
 
 var symbol = "BTCUSDT";
+
+var builder = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json");
+
+var configuration = builder.Build();
+
 
 MufexService MufexMainnet = new(
     apiKey: MufexConstants.API_KEY,

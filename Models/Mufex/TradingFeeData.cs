@@ -1,26 +1,19 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Exchanges.Mufex.Models;
-public class GetWalletBalanceData
+namespace Models.Mufex;
+public class TradingFeeData
 {
     [JsonProperty("list")]
-    public List<GetWalletBalanceDataList>? list { get; set; }
+    public List<TradingFeeDataList>? list { get; set; }
 }
-
-public class GetWalletBalanceDataList
+public class TradingFeeDataList
 {
-    public string? coin { get; set; }
-    public double? equity { get; set; }
-    public double? walletBalance { get; set; }
-    public double? positionMargin { get; set; }
-    public double? availableBalance { get; set; }
-    public double? orderMargin { get; set; }
-    public double? occClosingFee { get; set; }
-    public double? occFundingFee { get; set; }
-    public double? unrealisedPnl { get; set; }
-    public double? cumRealisedPnl { get; set; }
-    public double? givenCash { get; set; }
-    public double? serviceCash { get; set; }
+    /// <summary>
+    /// https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-balance
+    /// </summary>
+    public string? symbol { get; set; }
+    public double? takerFeeRate { get; set; }
+    public double? makerFeeRate { get; set; }
 }
 
 /*
@@ -49,4 +42,4 @@ https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-balance
     "ext_info": {},
     "time": 1658736635763
 }
-*/  
+*/

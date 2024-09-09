@@ -1,29 +1,22 @@
-using System;
-using System.Text;
 using Exchanges.Utils;
+using Microsoft.Extensions.Configuration;
 
 namespace Exchanges.Mufex;
 
 public class Mufex : Exchange
 {
+    private readonly IConfiguration _configuration;
+
     public Mufex(
-        string? apiKey = null,
-        string? secretKey = null,
-        string? baseUrl = null,
-        bool debugMode = false,
-        string recvWindow = ExchangeConstants.DEFAULT_REC_WINDOW
-    ) : base(apiKey, secretKey, baseUrl, debugMode, recvWindow)
+        IConfiguration configuration,
+    ) : base("mufex url", recvWindow)
     {
+        _configuration = configuration;
     }
-    protected override HttpRequestMessage BuildHttpRequest(
-            string requestUrl,
-            HttpMethod httpMethod,
-            string? signature,
-            string? postString
+    protected override Dictionary<string, object> BuildHttpRequest(
             )
     {
-        var theUrl = this.BaseUrl + requestUrl;
-        HttpRequestMessage request = new(httpMethod, theUrl);
+        var headers = new Dictionary<string, object>();
         request.Headers.Add("User-Agent", this.UserAgent);
         if (signature != null && signature.Length > 0)
         {
@@ -36,10 +29,6 @@ public class Mufex : Exchange
         if (this.ApiKey is not null)
         {
             request.Headers.Add("MF-ACCESS-API-KEY", this.ApiKey);
-        }
-        if (postString is not null)
-        {
-            request.Content = new StringContent(postString, Encoding.UTF8, "application/json");
         }
         return request;
     }
