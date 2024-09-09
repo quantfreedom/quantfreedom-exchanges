@@ -18,7 +18,9 @@ public class ApiService : IApiService
     }
     public async Task<T?> SendSignedGetAsync<T>(
         string requestUrl,
-        HttpMethod httpMethod,
+        string currentTimeStamp,
+        string signatureHeaderName,
+        Dictionary<string, string> headers,
         Dictionary<string, object>? query = null
     )
     {
@@ -27,46 +29,58 @@ public class ApiService : IApiService
         {
             queryString = GenerateQueryString(query);
         }
+
+        headers.Add(signatureHeaderName, GenerateSignature(queryString, currentTimeStamp));
+
         requestUrl = queryString.Length > 0 ? requestUrl + "?" + queryString : requestUrl;
-    }
-
-    public async Task<T?> SendSignedAsync<T>(
-    string requestUrl,
-    HttpMethod httpMethod,
-    Dictionary<string, object>? query = null
-    )
-    {
-        string? queryString = string.Empty;
-        string? postString = null;
-
-        else if (httpMethod == HttpMethod.Post)
-        {
-            if (query is not null)
-            {
-                queryString = JsonConvert.SerializeObject(query);
-                postString = queryString;
-            }
-        }
-
-
         var response = await SendAsync<T>(
             requestUrl: requestUrl,
-            httpMethod: httpMethod,
-            signature: signature,
-            postString: postString
+            httpMethod: HttpMethod.Get,
+            headers: headers
+            );
+
+        return response;
+    }
+
+    public async Task<T?> SendSignedPostAsync<T>(
+        string requestUrl,
+        string currentTimeStamp,
+        string signatureHeaderName,
+        Dictionary<string, string> headers,
+        Dictionary<string, object>? query = null
+        )
+    {
+        string queryString = null;
+
+        if (query is not null)
+        {
+            queryString = JsonConvert.SerializeObject(query);
+        }
+
+        headers.Add(signatureHeaderName, GenerateSignature(queryString ?? string.Empty, currentTimeStamp));
+        var response = await SendAsync<T>(
+            requestUrl: requestUrl,
+            httpMethod: HttpMethod.Post,
+            headers: headers,
+            postString: queryString
             );
 
         return response;
 
     }
 
-    private string GenerateSignature(string queryString)
+    private string GenerateQueryString(IDictionary<string, object> parameters)
+    {
+        var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}"));
+        return queryString;
+    }
+
+    private string GenerateSignature(string queryString, string currentTimeStamp)
     {
         var apiKey = _configuration["Exchange:ApiKey"];
         var secretKey = _configuration["Exchange:SecretKey"];
-        var recvWindow = _configuration["Exchange:SecretKey"];
+        var recvWindow = _configuration["RecvWindow"];
 
-        var currentTimeStamp = ExchangeUtils.GetCurrentTimeStampString();
         string rawData = currentTimeStamp + apiKey + recvWindow + queryString;
         try
         {
@@ -86,17 +100,29 @@ public class ApiService : IApiService
     private async Task<T?> SendAsync<T>(
        string requestUrl,
        HttpMethod httpMethod,
-       string? signature = null,
+       Dictionary<string, string> headers,
        string? postString = null
        )
     {
         using var httpClient = new HttpClient();
-        HttpRequestMessage request = BuildHttpRequest(requestUrl, httpMethod, signature, postString);
+
+        HttpRequestMessage request = new(httpMethod, requestUrl);
+        foreach (var header in headers)
+        {
+            request.Headers.Add(header.Key, header.Value);
+        }
+
+        if (postString is not null)
+        {
+            request.Content = new StringContent(postString, Encoding.UTF8, "application/json");
+        }
 
         HttpResponseMessage response = await httpClient.SendAsync(request);
 
         using HttpContent responseContent = response.Content;
         string contentString = await responseContent.ReadAsStringAsync();
+
+        //TODO clean this part
         if (response.IsSuccessStatusCode)
         {
             if (typeof(T) == typeof(string))

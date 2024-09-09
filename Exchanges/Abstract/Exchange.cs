@@ -1,45 +1,41 @@
-﻿using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
-using Exchanges.Exceptions;
-using Exchanges.Utils;
+﻿using Exchanges.Services.Interfaces;
 using Exchnages.Utils;
-using Newtonsoft.Json;
 
 namespace Exchanges;
+
 public abstract class Exchange
 {
-    public readonly string? BaseUrl;
-    protected abstract HttpRequestHeaders BuildHttpRequest(
-        HttpMethod httpMethod
-        );
+    public readonly string BaseUrl;
+    public readonly string SignatureHeaderName;
+    private readonly IApiService _apiService;
+    protected abstract Dictionary<string, string> BuildRequestHeaders(string currentTimeStamp, bool includeApiKey);
         
     public Exchange(
+        IApiService apiService,
         string baseUrl,
-        string recvWindow = ExchangeConstants.DEFAULT_REC_WINDOW
+        string signatureHeaderName
     )
     {
         this.BaseUrl = baseUrl;
+        this.SignatureHeaderName = signatureHeaderName;
+        _apiService = apiService;
     }
 
 
-    public async Task<string> CallRequest(
+    public async Task<T> GetAccountBalance<T>(
         Dictionary<string, object> query,
-        string requestUrl,
-        HttpMethod httpMethod
+        string requestUrl
         )
     {
-        var response = await SendSignedAsync<string>(
-                requestUrl: requestUrl,
-                httpMethod: HttpMethod.Get,
+        var currentTimeStamp = ExchangeUtils.GetCurrentTimeStampString();
+        var headers = BuildRequestHeaders(currentTimeStamp, true);
+        var response = await _apiService.SendSignedGetAsync<T>(
+                requestUrl: BaseUrl.TrimEnd('/') + '/' + requestUrl.TrimStart('/'),
+                currentTimeStamp: currentTimeStamp,
+                signatureHeaderName: SignatureHeaderName,
+                headers: headers,
                 query: query
                 );
         return response;
-    }
-    
-    private string GenerateQueryString(IDictionary<string, object> parameters)
-    {
-        var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}"));
-        return queryString;
     }
 }
