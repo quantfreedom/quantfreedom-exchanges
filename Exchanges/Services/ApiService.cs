@@ -1,8 +1,5 @@
 ﻿using Exchanges.Exceptions;
 using Exchanges.Services.Interfaces;
-using Exchnages.Utils;
-using Microsoft.Extensions.Configuration;
-using Models;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,13 +8,11 @@ namespace Exchanges.Services;
 
 public class ApiService : IApiService
 {
-    private readonly IConfiguration _configuration;
-    public ApiService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    public string ApiKey { get; set; }
+    public string SecretKey { get; set; }
+    public string BaseUrl { get; set; }
     public async Task<T?> SendSignedGetAsync<T>(
-        string requestUrl,
+        string endPoint,
         string currentTimeStamp,
         string signatureHeaderName,
         Dictionary<string, string> headers,
@@ -30,11 +25,12 @@ public class ApiService : IApiService
             queryString = GenerateQueryString(query);
         }
 
-        headers.Add(signatureHeaderName, GenerateSignature(queryString, currentTimeStamp));
+        var signature = GenerateSignature(queryString, currentTimeStamp);
+        headers.Add(signatureHeaderName, signature);
 
-        requestUrl = queryString.Length > 0 ? requestUrl + "?" + queryString : requestUrl;
+        endPoint = queryString.Length > 0 ? endPoint + "?" + queryString : endPoint;
         var response = await SendAsync<T>(
-            requestUrl: requestUrl,
+            endPoint: endPoint,
             httpMethod: HttpMethod.Get,
             headers: headers
             );
@@ -43,7 +39,7 @@ public class ApiService : IApiService
     }
 
     public async Task<T?> SendSignedPostAsync<T>(
-        string requestUrl,
+        string endPoint,
         string currentTimeStamp,
         string signatureHeaderName,
         Dictionary<string, string> headers,
@@ -59,7 +55,7 @@ public class ApiService : IApiService
 
         headers.Add(signatureHeaderName, GenerateSignature(queryString ?? string.Empty, currentTimeStamp));
         var response = await SendAsync<T>(
-            requestUrl: requestUrl,
+            endPoint: endPoint,
             httpMethod: HttpMethod.Post,
             headers: headers,
             postString: queryString
@@ -77,16 +73,12 @@ public class ApiService : IApiService
 
     private string GenerateSignature(string queryString, string currentTimeStamp)
     {
-        var apiKey = _configuration["Exchange:ApiKey"];
-        var secretKey = _configuration["Exchange:SecretKey"];
-        var recvWindow = _configuration["RecvWindow"];
-
-        string rawData = currentTimeStamp + apiKey + recvWindow + queryString;
+        string rawData = currentTimeStamp + this.ApiKey + "5000" + queryString;
         try
         {
-            if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(secretKey))
+            if (string.IsNullOrEmpty(this.ApiKey) || string.IsNullOrEmpty(this.SecretKey))
                 throw new Exception("Please set your api key and api secret");
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(this.SecretKey));
             byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawData));
             var signature = BitConverter.ToString(computedHash).Replace("-", "").ToLower();
             return signature;
@@ -98,7 +90,7 @@ public class ApiService : IApiService
     }
 
     private async Task<T?> SendAsync<T>(
-       string requestUrl,
+       string endPoint,
        HttpMethod httpMethod,
        Dictionary<string, string> headers,
        string? postString = null
@@ -106,7 +98,7 @@ public class ApiService : IApiService
     {
         using var httpClient = new HttpClient();
 
-        HttpRequestMessage request = new(httpMethod, _configuration["Exchange:Mainnet"] + requestUrl);
+        HttpRequestMessage request = new(httpMethod, this.BaseUrl + endPoint);
         foreach (var header in headers)
         {
             request.Headers.Add(header.Key, header.Value);
@@ -137,7 +129,7 @@ public class ApiService : IApiService
                 }
                 catch (JsonReaderException ex)
                 {
-                    var clientException = new ExchangeClientException($"Failed to map server response from '{requestUrl}' to given type", -1, ex)
+                    var clientException = new ExchangeClientException($"Failed to map server response from '{endPoint}' to given type", -1, ex)
                     {
                         StatusCode = (int)response.StatusCode,
                         Headers = response.Headers.ToDictionary(a => a.Key, a => a.Value)

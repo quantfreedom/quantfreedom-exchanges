@@ -10,15 +10,22 @@ namespace Exchanges.Mufex;
 
 public class Mufex
 {
-    private readonly IConfiguration _configuration;
     private readonly IApiService _apiService;
+    private readonly string SignatureHeaderName = "MF-ACCESS-SIGN";
+    public readonly string TestnetURL = "https://api.testnet.mufex.finance";
+    public readonly string MainnetURL = "https://api.mufex.finance";
     public Mufex(
-        IConfiguration configuration,
-        IApiService apiService
+        IApiService apiService,
+        string apiKey,
+        string secretKey,
+        bool useTestnet = false
     )
     {
-        _configuration = configuration;
         _apiService = apiService;
+        _apiService.ApiKey = apiKey;
+        _apiService.SecretKey = secretKey;
+        _apiService.BaseUrl = useTestnet ? TestnetURL : MainnetURL;
+
     }
     private Dictionary<string, string> BuildRequestHeaders(string currentTimeStamp, bool includeApiKey)
     {
@@ -26,13 +33,13 @@ public class Mufex
         {
             { "MF-ACCESS-SIGN-TYPE", ExchangeConstants.DEFAULT_SIGN_TYPE },
             { "MF-ACCESS-TIMESTAMP", currentTimeStamp },
-            { "MF-ACCESS-RECV-WINDOW", _configuration["RecvWindow"] },
+            { "MF-ACCESS-RECV-WINDOW", "5000" },
             { "X-Referer", "AKF3CWKDT" }
         };
 
         if (includeApiKey)
         {
-            headers.Add("MF-ACCESS-API-KEY", _configuration["Exchange:ApiKey"]);
+            headers.Add("MF-ACCESS-API-KEY", _apiService.ApiKey);
         }
         return headers;
     }
@@ -52,9 +59,9 @@ public class Mufex
         var headers = BuildRequestHeaders(currentTimeStamp, true);
 
         var response = await _apiService.SendSignedGetAsync<string>(
-            requestUrl: endpoint,
+            endPoint: endpoint,
             query: query,
-            signatureHeaderName: _configuration["Exchange:SignatureHeaderName"],
+            signatureHeaderName: this.SignatureHeaderName,
             currentTimeStamp: currentTimeStamp,
             headers: headers
             );

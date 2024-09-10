@@ -1,26 +1,24 @@
-﻿using Exchanges.Mufex;
+﻿using System.Security.Cryptography.X509Certificates;
+using Exchanges.Mufex;
 using Exchanges.Services;
 using Exchanges.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using mufex.net.api.Keys;
 
 var symbol = "BTCUSDT";
 var coin = "USDT";
 
-var builder = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json");
-var configuration = builder.Build();
-
-
 var services = new ServiceCollection();
-services.AddSingleton<IConfiguration>(configuration);
 services.AddTransient<IApiService, ApiService>();
-
 var servicesProvider = services.BuildServiceProvider();
 var apiService = servicesProvider.GetService<IApiService>();
 
-var mufexExchange = new Mufex(configuration, apiService);
+var mufexExchange = new Mufex(
+        apiService: apiService,
+        apiKey: MufexMainTestAccount.ApiKey,
+        secretKey: MufexMainTestAccount.Secret
+        );
 
 var response = await mufexExchange.GetAccountBalance(coin);
 var a = response;
