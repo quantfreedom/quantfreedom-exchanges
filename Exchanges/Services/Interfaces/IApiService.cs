@@ -23,4 +23,9 @@ public interface IApiService
         Dictionary<string, string> headers,
         Dictionary<string, object>? query = null
         );
+    
+    Task<T?> SendGetAsync<T>(
+        string endPoint,
+        Dictionary<string, object>? query = null
+    );
 }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace mufex.net.api.Utils;
-public class MufexUtils
+public class ExchangeUtils
 {
 
     public static string GetCurrentTimeStampString()

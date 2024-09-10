@@ -68,7 +68,7 @@ public class MufexSettersService
             { "tradeMode", leverageMode.Value }
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("buyLeverage", buyLeverage.ToString()),
             ("sellLeverage", sellLeverage.ToString())

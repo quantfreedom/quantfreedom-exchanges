@@ -24,7 +24,7 @@ public class MufexCancelersService
             {"symbol", symbol},
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("orderLinkId", orderLinkId)
@@ -35,7 +35,7 @@ public class MufexCancelersService
             httpMethod: HttpMethod.Post,
             query: query
             );
-        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<CreateOrderData>>(result);
+        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<OrderData>>(result);
         var jsonResultList = jsonResult.data;
         string jsonFormatted = JValue.Parse(result).ToString(Formatting.Indented);
         Console.WriteLine(jsonFormatted);
@@ -54,7 +54,7 @@ public class MufexCancelersService
             httpMethod: HttpMethod.Post,
             query: query
             );
-        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<CreateOrderData>>(result);
+        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<OrderData>>(result);
         var jsonResultList = jsonResult.data;
         string jsonFormatted = JValue.Parse(result).ToString(Formatting.Indented);
         Console.WriteLine(jsonFormatted);

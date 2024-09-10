@@ -1,15 +1,15 @@
 ﻿using Newtonsoft.Json;
 
-namespace Models.Mufex;
+namespace mufex.net.api.Models;
 public class GeneralResponse<T>
 {
     // do I need to have this json property? TODO: check
 
     [JsonProperty("code")]
-    public int? code { get; set; }
+    public int code { get; set; }
 
     [JsonProperty("message")]
-    public string? message { get; set; }
+    public string message { get; set; }
 
     [JsonProperty("data")]
     public T? data { get; set; }

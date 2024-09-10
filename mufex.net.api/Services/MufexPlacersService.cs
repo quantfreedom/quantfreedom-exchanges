@@ -76,7 +76,7 @@ public class MufexPlacersService
                             { "timeInForce", timeInForce.Value }
                         };
 
-        MufexUtils.AddOptionalParameters(query,
+        ExchangeUtils.AddOptionalParameters(query,
             ("price", price.ToString()),
             ("triggerDirection", triggerDirection),
             ("triggerPrice", triggerPrice.ToString()),
@@ -94,7 +94,7 @@ public class MufexPlacersService
             httpMethod: HttpMethod.Post,
             query: query
             );
-        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<CreateOrderData>>(result);
+        var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<OrderData>>(result);
         var orderId = jsonResult.data.orderId;
         return orderId;
     }

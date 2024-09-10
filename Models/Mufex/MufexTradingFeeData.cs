@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 
 namespace Models.Mufex;
-public class TradingFeeData
+public class MufexTradingFeeDataList
 {
     [JsonProperty("list")]
-    public List<TradingFeeDataList>? list { get; set; }
+    public List<MufexTradingFeeData>? list { get; set; }
 }
-public class TradingFeeDataList
+public class MufexTradingFeeData
 {
     /// <summary>
     /// https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-balance

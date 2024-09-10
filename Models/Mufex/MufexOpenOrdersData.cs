@@ -1,14 +1,14 @@
 using Newtonsoft.Json;
 
-namespace mufex.net.api.Models;
-public class OpenOrdersDataList
+namespace Models.Mufex;
+public class MufexOpenOrdersDataList
 {
   [JsonProperty("list")]
-  public List<OpenOrdersData>? list { get; set; }
+  public List<MufexOpenOrdersData>? list { get; set; }
   public string? nextPageCursor { get; set; }
 }
 
-public class OpenOrdersData
+public class MufexOpenOrdersData
 {
   public string? symbol { get; set; }
   public string? orderId { get; set; }

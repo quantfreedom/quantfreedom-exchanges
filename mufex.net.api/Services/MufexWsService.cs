@@ -40,7 +40,7 @@
 //                 continue;
 //             }
 //             var jsonResult = JsonConvert.DeserializeObject<WsTradeData>(receivedMessage);
-// var parsedData = MufexUtils.WsTradeParseModel(jsonResult);
+// var parsedData = ExchangeUtils.WsTradeParseModel(jsonResult);
 // var testing = 1;
 //         }
 //     }

@@ -29,7 +29,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("coin", coin)
         );
@@ -54,7 +54,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("symbol", symbol)
         );
@@ -115,7 +115,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("settleCoin", settleCoin),
@@ -150,14 +150,14 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>{
             { "symbol", symbol }
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("startTime", startTimeUtcTimestamp),
@@ -191,14 +191,14 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>{
             { "symbol", symbol }
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("startTime", startTimeUtcTimestamp),
             ("endTime", endTimeUtcTimestamp),
@@ -247,12 +247,12 @@ public class MufexGettersService
         int? limit = null
     )
     {
-        long? startTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(startTime);
-        long? endTimeUtcTimestamp = MufexUtils.GetUnixTimeStampLong(endTime);
+        long? startTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(startTime);
+        long? endTimeUtcTimestamp = ExchangeUtils.GetUnixTimeStampLong(endTime);
 
         var query = new Dictionary<string, object>();
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("startTime", startTimeUtcTimestamp),
             ("endTime", endTimeUtcTimestamp),
@@ -289,7 +289,7 @@ public class MufexGettersService
             { "category", category }
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("limit", limit)
@@ -344,7 +344,7 @@ public class MufexGettersService
             { "symbol", symbol }
         };
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("orderId", orderId),
             ("orderLinkID", orderLinkID),
@@ -382,7 +382,7 @@ public class MufexGettersService
     {
         var query = new Dictionary<string, object>();
 
-        MufexUtils.AddOptionalParameters(
+        ExchangeUtils.AddOptionalParameters(
             query,
             ("symbol", symbol),
             ("orderId", orderId),
@@ -463,7 +463,7 @@ public class MufexGettersService
         var jsonResult = JsonConvert.DeserializeObject<GeneralResponse<CandleData>>(result);
         var messageResult = jsonResult.message;
         var needsParsing = jsonResult.data;
-        var parsedData = MufexUtils.GetCandleParseModel(needsParsing);
+        var parsedData = ExchangeUtils.GetCandleParseModel(needsParsing);
         return parsedData;
     }
 }

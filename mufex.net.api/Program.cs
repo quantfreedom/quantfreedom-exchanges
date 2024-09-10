@@ -1,9 +1,11 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Runtime.CompilerServices;
+using Exchanges.Bybit;
 using Exchanges.Mufex;
 using Exchanges.Services;
 using Exchanges.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Models.Bybit;
+using Models.Mufex;
 using mufex.net.api.Keys;
 
 var symbol = "BTCUSDT";
@@ -14,48 +16,28 @@ services.AddTransient<IApiService, ApiService>();
 var servicesProvider = services.BuildServiceProvider();
 var apiService = servicesProvider.GetService<IApiService>();
 
-var mufexExchange = new Mufex(
-        apiService: apiService,
-        apiKey: MufexMainTestAccount.ApiKey,
-        secretKey: MufexMainTestAccount.Secret
-        );
+// var mufexExchange = new Mufex(
+//         apiService: apiService,
+//         apiKey: MufexKeys.Mainnet_TestAccount_ApiKey,
+//         secretKey: MufexKeys.Mainnet_TestAccount_Secret,
+//         useTestnet: false
+//         );
+// var result = await mufexExchange.GetAccountBalance(coin);
 
-var response = await mufexExchange.GetAccountBalance(coin);
-var a = response;
-//MufexService MufexMainnet = new(
-//    apiKey: MufexConstants.API_KEY,
-//    apiSecret: MufexConstants.API_SECRET,
-//    baseUrl: MufexConstants.HTTP_MAINNET_URL
-//    );
+var bybitExchange = new Bybit(
+       apiService: apiService,
+       apiKey: BybitKeys.Testnet_Neo_ApiKey,
+       secretKey: BybitKeys.Testnet_Neo_SecretKey,
+       useTestnet: true
+       );
 
-// var orderId = await MufexMainnet.placers.PlaceOrder(
-//     symbol: symbol,
-//     side: Side.Buy,
-//     orderType: OrderType.Market,
-//     qty: 0.001,
-//     timeInForce: TimeInForce.GoodTillCancel,
-//     positionIdx: PositionIndex.HedgeModeBuySide,
-//     stopLoss: 55400
-//     );
-
-// var tpOrderId = await MufexMainnet.placers.PlaceOrder(
-//     symbol: symbol,
-//     side: Side.Sell,
-//     orderType: OrderType.Limit,
-//     qty: 0.001,
-//     price: 60000,
-//     timeInForce: TimeInForce.PostOnly,
-//     positionIdx: PositionIndex.HedgeModeBuySide,
-//     reduceOnly: true
-//     );
-
-// var positionInfo = await MufexMainnet.getters.GetPositionInfo(symbol: symbol);
-// var filledOrderInfo = await MufexMainnet.getters.GetFilledOrders(
-//     symbol: symbol,
-//     orderId: orderId
-//     );
-// var openOrders = await MufexMainnet.getters.GetOpenOrders(symbol: symbol);
-// Console.ReadLine();
-
-//await MufexMainnet.getters.GetCandles();
-
+var orderId = await bybitExchange.PlaceOrder(
+        category: BybitCategoryType.Linear,
+        symbol: symbol,
+        side: BybitSide.Buy,
+        orderType: BybitOrderType.Limit,
+        qty: 0.001m,
+        price: 55600,
+        positionIdx: BybitPositionIndex.HedgeModeBuySide
+    );
+var a = 0;

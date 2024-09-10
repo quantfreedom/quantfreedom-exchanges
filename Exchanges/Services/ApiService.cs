@@ -37,6 +37,25 @@ public class ApiService : IApiService
 
         return response;
     }
+    public async Task<T?> SendGetAsync<T>(
+        string endPoint,
+        Dictionary<string, object>? query = null
+    )
+    {
+        string queryString = string.Empty;
+        if (query is not null)
+        {
+            queryString = GenerateQueryString(query);
+        }
+
+        endPoint = queryString.Length > 0 ? endPoint + "?" + queryString : endPoint;
+        var response = await SendAsync<T>(
+            endPoint: endPoint,
+            httpMethod: HttpMethod.Get
+            );
+
+        return response;
+    }
 
     public async Task<T?> SendSignedPostAsync<T>(
         string endPoint,
@@ -92,21 +111,24 @@ public class ApiService : IApiService
     private async Task<T?> SendAsync<T>(
        string endPoint,
        HttpMethod httpMethod,
-       Dictionary<string, string> headers,
+       Dictionary<string, string>? headers = null,
        string? postString = null
        )
     {
         using var httpClient = new HttpClient();
 
         HttpRequestMessage request = new(httpMethod, this.BaseUrl + endPoint);
-        foreach (var header in headers)
+        if (headers is not null)
         {
-            request.Headers.Add(header.Key, header.Value);
-        }
+            foreach (var header in headers)
+            {
+                request.Headers.Add(header.Key, header.Value);
+            }
 
-        if (postString is not null)
-        {
-            request.Content = new StringContent(postString, Encoding.UTF8, "application/json");
+            if (postString is not null)
+            {
+                request.Content = new StringContent(postString, Encoding.UTF8, "application/json");
+            }
         }
 
         HttpResponseMessage response = await httpClient.SendAsync(request);
@@ -169,5 +191,6 @@ public class ApiService : IApiService
         }
         return default;
     }
+
 }
 

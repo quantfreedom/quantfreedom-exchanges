@@ -43,7 +43,7 @@ public class MufexApiService
         string? queryString = string.Empty;
         string? postString = null;
         string? signature = null;
-        this.CurrentTimeStamp = MufexUtils.GetCurrentTimeStampString();
+        this.CurrentTimeStamp = ExchangeUtils.GetCurrentTimeStampString();
 
         if (httpMethod == HttpMethod.Get)
         {

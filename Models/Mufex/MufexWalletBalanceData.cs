@@ -2,13 +2,13 @@
 
 namespace Models.Mufex;
 
-public class GetWalletBalanceData
+public class MufexWalletBalanceDataList
 {
     [JsonProperty("list")]
-    public List<GetWalletBalanceDataList>? list { get; set; }
+    public List<MufexWalletBalanceData>? list { get; set; }
 }
 
-public class GetWalletBalanceDataList
+public class MufexWalletBalanceData
 {
     public string? coin { get; set; }
     public double? equity { get; set; }
