@@ -86,7 +86,7 @@ public class Bybit
         return responseList;
     }
     public async Task<List<BybitOpenAndClosedOrdersData>?> GetOpenAndClosedOrders(
-        BybitCategoryType category,
+        string category,
         string? symbol = null,
         string? baseCoin = null,
         string? settleCoin = null,
@@ -101,7 +101,7 @@ public class Bybit
         var endpoint = "/v5/order/realtime";
 
         var query = new Dictionary<string, object>{
-            { "category", category.Value}
+            { "category", category}
         };
 
         ExchangeUtils.AddOptionalParameters(
@@ -131,7 +131,7 @@ public class Bybit
         return responseList;
     }
     public async Task<List<BybitOpenAndClosedOrdersData>?> GetOpenOrders(
-        BybitCategoryType category,
+        string category,
         string? symbol = null,
         string? baseCoin = null,
         string? settleCoin = null,
@@ -156,7 +156,7 @@ public class Bybit
     }
 
     public async Task<bool?> CancelOpenOrder(
-        BybitCategoryType category,
+        string category,
         string symbol,
         string? orderId = null,
         string? orderLinkId = null,
@@ -167,7 +167,7 @@ public class Bybit
         var endPoint = "/v5/order/cancel";
 
         var query = new Dictionary<string, object>{
-            {"category", category.Value},
+            {"category", category},
             {"symbol", symbol}
         };
 
@@ -193,7 +193,7 @@ public class Bybit
         return result;
     }
     public async Task<List<BybitAllSymbolInfoData>> GetAllSymbolsInfo(
-        BybitCategoryType category,
+        string category,
         string? symbol = null,
         string? baseCoin = null,
         int? limit = null
@@ -222,7 +222,7 @@ public class Bybit
         return responseList;
     }
 
-    public async Task<List<string>> GetListOfSymbols(BybitCategoryType category)
+    public async Task<List<string>> GetListOfSymbols(string category)
     {
         var symbols = new List<string>();
 
@@ -237,7 +237,7 @@ public class Bybit
 
 
     public async Task<string?> PlaceOrder(
-        BybitCategoryType category,
+        string category,
         string symbol,
         BybitSide side,
         BybitOrderType orderType,
@@ -275,7 +275,7 @@ public class Bybit
 
         var query = new Dictionary<string, object>
                         {
-                            { "category", category.Value },
+                            { "category", category },
                             { "symbol", symbol },
                             { "side", side.Value },
                             { "orderType", orderType.Value },

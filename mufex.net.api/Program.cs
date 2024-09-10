@@ -2,6 +2,7 @@
 using Exchanges.Bybit;
 using Exchanges.Mufex;
 using Exchanges.Services;
+using Exchanges.Websockets;
 using Exchanges.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Models.Bybit;
@@ -31,13 +32,13 @@ var bybitExchange = new Bybit(
        useTestnet: true
        );
 
-var orderId = await bybitExchange.PlaceOrder(
-        category: BybitCategoryType.Linear,
-        symbol: symbol,
-        side: BybitSide.Buy,
-        orderType: BybitOrderType.Limit,
-        qty: 0.001m,
-        price: 55600,
-        positionIdx: BybitPositionIndex.HedgeModeBuySide
-    );
+var bybitWebSocket = new ExchangesWebSocket(handler: new BybitWebSocketHandler());
+bybitWebSocket.OnMessageReceived(
+    (data) =>
+    {
+        Console.WriteLine(data);
+
+        return Task.CompletedTask;
+    }, CancellationToken.None);
+await bybitWebSocket.ConnectAsync(new string[] { "publicTrade.BTCUSDT" }, CancellationToken.None);
 var a = 0;

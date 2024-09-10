@@ -53,5 +53,12 @@ public class ExchangeUtils
         string jsonFormatted = JValue.Parse(jsonResultString).ToString(Formatting.Indented);
         Console.WriteLine(jsonFormatted);
     }
+    public static void EnsureNoDuplicates(string[] args)
+    {
+        if (args.Distinct().Count() != args.Length)
+        {
+            throw new ArgumentException("The provided arguments contain duplicate values.");
+        }
+    }
 
 }
