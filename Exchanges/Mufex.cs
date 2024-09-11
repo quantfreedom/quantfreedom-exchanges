@@ -16,8 +16,7 @@ public class Mufex
         IApiService apiService,
         string apiKey,
         string secretKey,
-        bool useTestnet
-    )
+        bool useTestnet)
     {
         _apiService = apiService;
         _apiService.ApiKey = apiKey;
@@ -89,8 +88,7 @@ public class Mufex
         string? orderLinkID = null,
         MufexOrderStatusType? orderStatus = null,
         MufexOrderFilterType? orderFiler = null,
-        int? limit = null
-    )
+        int? limit = null)
     {
         // https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-contract_getopenorder
 
@@ -160,8 +158,7 @@ public class Mufex
     public async Task<List<MufexAllSymbolInfoData>?> GetAllSymbolsInfo(
         string category = "linear",
         string? symbol = null,
-        int? limit = null
-    )
+        int? limit = null)
     {
         // https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-dv_instrhead
 
@@ -205,7 +202,6 @@ public class Mufex
         MufexOrderType orderType,
         decimal qty,
         MufexTimeInForce timeInForce,
-
         decimal? price = null,
         MufexTriggerDirection? triggerDirection = null,
         decimal? triggerPrice = null,
@@ -216,8 +212,7 @@ public class Mufex
         decimal? takeProfit = null,
         decimal? stopLoss = null,
         bool? reduceOnly = null,
-        bool? closeOnTrigger = null
-    )
+        bool? closeOnTrigger = null)
     {
         // https://www.mufex.finance/apidocs/derivatives/contract/index.html#t-dv_placeorder
 

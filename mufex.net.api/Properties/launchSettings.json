@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "mufex.net.api": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Project"
+    }
+  }
+}

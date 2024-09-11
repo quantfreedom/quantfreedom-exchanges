@@ -1,44 +1,59 @@
-﻿using System.Runtime.CompilerServices;
-using Exchanges.Bybit;
-using Exchanges.Mufex;
-using Exchanges.Services;
-using Exchanges.Websockets;
-using Exchanges.Services.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Models.Bybit;
-using Models.Mufex;
-using mufex.net.api.Keys;
+﻿// using Exchanges.Websockets;
+// using Newtonsoft.Json;
+// using Serilog;
+// using Exchanges.Utils;
 
-var symbol = "BTCUSDT";
-var coin = "USDT";
+// using var log = new LoggerConfiguration()
+//     .Enrich.WithCaller()
+//     .MinimumLevel.Debug()
+//     .WriteTo.File($"../../../logs/logs-{DateTime.Now:HH-mm-ss}-.log",
+//         rollingInterval: RollingInterval.Day,
+//         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} - {Level:u} - {Caller} {Message} {NewLine}{Exception}")
+//     .CreateLogger();
 
-var services = new ServiceCollection();
-services.AddTransient<IApiService, ApiService>();
-var servicesProvider = services.BuildServiceProvider();
-var apiService = servicesProvider.GetService<IApiService>();
+// //var symbol = "BTCUSDT";
+// //var coin = "USDT";
 
-// var mufexExchange = new Mufex(
-//         apiService: apiService,
-//         apiKey: MufexKeys.Mainnet_TestAccount_ApiKey,
-//         secretKey: MufexKeys.Mainnet_TestAccount_Secret,
-//         useTestnet: false
-//         );
-// var result = await mufexExchange.GetAccountBalance(coin);
+// //var services = new ServiceCollection();
+// //services.AddTransient<IApiService, ApiService>();
+// //var servicesProvider = services.BuildServiceProvider();
+// //var apiService = servicesProvider.GetService<IApiService>();
 
-var bybitExchange = new Bybit(
-       apiService: apiService,
-       apiKey: BybitKeys.Testnet_Neo_ApiKey,
-       secretKey: BybitKeys.Testnet_Neo_SecretKey,
-       useTestnet: true
-       );
+// // var mufexExchange = new Mufex(
+// //         apiService: apiService,
+// //         apiKey: MufexKeys.Mainnet_TestAccount_ApiKey,
+// //         secretKey: MufexKeys.Mainnet_TestAccount_Secret,
+// //         useTestnet: false
+// //         );
+// // var result = await mufexExchange.GetAccountBalance(coin);
 
-var bybitWebSocket = new ExchangesWebSocket(handler: new BybitWebSocketHandler());
-bybitWebSocket.OnMessageReceived(
-    (data) =>
-    {
-        Console.WriteLine(data);
+// //var bybitExchange = new Bybit(
+// //       apiService: apiService,
+// //       apiKey: BybitKeys.Testnet_Neo_ApiKey,
+// //       secretKey: BybitKeys.Testnet_Neo_SecretKey,
+// //       useTestnet: true
+// //       );
 
-        return Task.CompletedTask;
-    }, CancellationToken.None);
-await bybitWebSocket.ConnectAsync(new string[] { "publicTrade.BTCUSDT" }, CancellationToken.None);
-var a = 0;
+// var bybitWebSocket = new ExchangesWebSocket(handler: new BybitWebSocketHandler());
+// bybitWebSocket.OnMessageReceived(
+//     (data) =>
+//     {
+//         if (data.Contains("success"))
+//         {
+//             Console.WriteLine("Success");
+//             return Task.CompletedTask;
+//         }        
+//         var parsedData = bybitWebSocket.TradeStreamParser(data);
+//         foreach (var item in parsedData)
+//         {
+//             if (item.UsdtQty > 100_000)
+//             {
+//                 var serializedTrade = JsonConvert.SerializeObject(item, Formatting.Indented);
+//                 Console.WriteLine("Trade Data: \n" + serializedTrade + "\n");
+//             }
+//         }
+//         return Task.CompletedTask;
+//     }, CancellationToken.None);
+// await bybitWebSocket.ConnectAsync(new string[] { "publicTrade.BTCUSDT" }, CancellationToken.None);
+// Console.WriteLine("Press 'q' to quit the application.");
+// while (true) { }
