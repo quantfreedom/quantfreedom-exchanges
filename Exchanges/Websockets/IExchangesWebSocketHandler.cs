@@ -5,7 +5,7 @@ using Serilog.Core;
 
 namespace Exchanges.Websockets;
 
-public interface IExchangesWebSocketHandler:IDisposable
+public interface IExchangesWebSocketHandler : IDisposable
 {
     public string WsUrl
     {
@@ -30,5 +30,8 @@ public interface IExchangesWebSocketHandler:IDisposable
     Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken);
 
     Task SendAsync(ArraySegment<byte> buffer, WebSocketMessageType messageType, bool endOfMessage, CancellationToken cancellationToken);
-    List<ExchangeWsTradeData> GetTradeList(string receivedMessage);
+    (List<ExchangeWsTradeData>, string) GetTradeList(string receivedMessage);
+    Dictionary<string, object> CreateSubscriptionMessage(string[] args);
+
+
 }

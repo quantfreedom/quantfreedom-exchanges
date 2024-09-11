@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 namespace Models.Bybit;
 public class BybitWsTradeDataList
 {
+
     [JsonProperty("topic")]
     public string topic
     {
@@ -25,7 +26,41 @@ public class BybitWsTradeDataList
     }
 
     [JsonProperty("data")]
-    public List<ExchangeWsTradeData> tradeList
+    public List<BybitWsTradeData> tradeList
+    {
+        get; set;
+    }
+}
+
+
+public class BybitWsTradeData
+{
+    [JsonProperty("T")]
+    public long timestamp
+    {
+        get; set;
+    }
+
+    [JsonProperty("s")]
+    public string symbol
+    {
+        get; set;
+    }
+
+    [JsonProperty("S")]
+    public string side
+    {
+        get; set;
+    }
+
+    [JsonProperty("v")]
+    public decimal assetQty
+    {
+        get; set;
+    }
+
+    [JsonProperty("p")]
+    public decimal price
     {
         get; set;
     }

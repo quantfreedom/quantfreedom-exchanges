@@ -8,7 +8,7 @@ using Serilog.Core;
 namespace Exchanges.Websockets;
 
 
-public class BybitWebSocketHandler : IExchangesWebSocketHandler
+public class BinanceWebSocketHandler : IExchangesWebSocketHandler
 {
     private readonly ClientWebSocket webSocket;
 
@@ -29,10 +29,10 @@ public class BybitWebSocketHandler : IExchangesWebSocketHandler
         get; set;
     }
 
-    public BybitWebSocketHandler()
+    public BinanceWebSocketHandler()
     {
         this.webSocket = new ClientWebSocket();
-        this.WsUrl = BybitConstants.WS_LINEAR_MAINNET;
+        this.WsUrl = "wss://fstream.binance.com/ws";
     }
 
     public async Task CloseAsync(
@@ -95,10 +95,8 @@ public class BybitWebSocketHandler : IExchangesWebSocketHandler
     {
         try
         {
-            BybitWsTradeDataList bybitTradeData = JsonConvert.DeserializeObject<BybitWsTradeDataList>(receivedMessage);
-            var bybitSerializedTradeDataList = JsonConvert.SerializeObject(bybitTradeData.tradeList);
-            var exchangeTradeDataList = JsonConvert.DeserializeObject<List<ExchangeWsTradeData>>(bybitSerializedTradeDataList);
-            return (exchangeTradeDataList, "Bybit");
+            var tradeDataList = JsonConvert.DeserializeObject(receivedMessage);
+            return (new List<ExchangeWsTradeData>(), "Binance");
         }
         catch (Exception ex)
         {
@@ -106,17 +104,14 @@ public class BybitWebSocketHandler : IExchangesWebSocketHandler
             return (new List<ExchangeWsTradeData>(), "Bybit");
         }
     }
-
     public Dictionary<string, object> CreateSubscriptionMessage(string[] args)
     {
-
         var subMessage = new Dictionary<string, object>
         {
-            {"req_id", Guid.NewGuid().ToString()},
-            {"op", "subscribe"},
-            {"args", args},
+            {"method", "SUBSCRIBE"},
+            {"params", args},
+            {"id", 1}
         };
-
         return subMessage;
     }
 }

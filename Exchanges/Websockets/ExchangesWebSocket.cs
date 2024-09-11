@@ -24,7 +24,7 @@ public class ExchangesWebSocket : IDisposable
         Logger logger,
         IExchangesWebSocketHandler handler,
         int pingInterval = 20,
-        int receiveBufferSize = 262_144
+        int receiveBufferSize = 262_144 // TODO figure out some type of way to keep looping until we get the full message
     )
     {
         this._logger = logger;
@@ -85,15 +85,9 @@ public class ExchangesWebSocket : IDisposable
     private async Task SendSubscription(string[] args)
     {
         ExchangeUtils.EnsureNoDuplicates(args);
-        var subMessage = new
-        {
-            req_id = Guid.NewGuid().ToString(),
-            op = "subscribe",
-            args = args
-        };
-        _logger.Debug("going to serialize object");
+        var subMessage = this.Handler.CreateSubscriptionMessage(args);
         string subMessageJson = JsonConvert.SerializeObject(subMessage);
-        _logger.Debug("serialized object");
+
         await Console.Out.WriteLineAsync($"send subscription {subMessageJson}");
         await SendAsync(subMessageJson, CancellationToken.None);
     }
@@ -108,7 +102,7 @@ public class ExchangesWebSocket : IDisposable
                 receiveResult = await this.Handler.ReceiveAsync(buffer, cancellationToken);
                 var resized = new byte[buffer.Count];
                 Array.Copy(buffer.Array, buffer.Offset, resized, 0, buffer.Count);
-                
+
                 if (receiveResult.MessageType == WebSocketMessageType.Close)
                 {
                     break;
@@ -147,11 +141,11 @@ public class ExchangesWebSocket : IDisposable
 
     public List<ExchangeWsTradeDataParsed> TradeStreamParser(string receivedMessage)
     {
-        var tradeDataList = this.Handler.GetTradeList(receivedMessage);
-        var parsedData = WsTradeParseModel(tradeDataList);
+        var (tradeDataList, exchange) = this.Handler.GetTradeList(receivedMessage);
+        var parsedData = WsTradeParseModel(tradeDataList, exchange);
         return parsedData;
     }
-    private List<ExchangeWsTradeDataParsed> WsTradeParseModel(List<ExchangeWsTradeData> tradeDataList)
+    private List<ExchangeWsTradeDataParsed> WsTradeParseModel(List<ExchangeWsTradeData> tradeDataList, string exchange)
     {
         var parsedData = tradeDataList
             .GroupBy(t => new { Price = t.price, Time = t.timestamp, Side = t.side })
@@ -164,6 +158,7 @@ public class ExchangesWebSocket : IDisposable
 
                 return new ExchangeWsTradeDataParsed
                 {
+                    Exchange = exchange,
                     Timestamp = timestamp,
                     AssetQty = assetQty,
                     Price = price,

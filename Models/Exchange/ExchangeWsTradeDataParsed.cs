@@ -6,6 +6,10 @@ namespace Models.Exchange;
 
 public class ExchangeWsTradeDataParsed
 {
+    public string Exchange
+    {
+        get; set;
+    }
     public long Timestamp
     {
         get; set;
@@ -30,31 +34,31 @@ public class ExchangeWsTradeDataParsed
 
 public class ExchangeWsTradeData
 {
-    [JsonProperty("T")]
+    [JsonProperty("timestamp")]
     public long timestamp
     {
         get; set;
     }
 
-    [JsonProperty("s")]
+    [JsonProperty("symbol")]
     public string symbol
     {
         get; set;
     }
 
-    [JsonProperty("S")]
+    [JsonProperty("side")]
     public string side
     {
         get; set;
     }
 
-    [JsonProperty("v")]
+    [JsonProperty("assetQty")]
     public decimal assetQty
     {
         get; set;
     }
 
-    [JsonProperty("p")]
+    [JsonProperty("price")]
     public decimal price
     {
         get; set;

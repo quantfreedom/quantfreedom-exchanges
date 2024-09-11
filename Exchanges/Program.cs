@@ -34,6 +34,23 @@ using var log = new LoggerConfiguration()
 //       useTestnet: true
 //       );
 
+// var binanceWebSocket = new ExchangesWebSocket(
+//     logger: log,
+//     handler: new BinanceWebSocketHandler());
+// binanceWebSocket.OnMessageReceived(
+//     (data) =>
+//     {
+//         if (data.Contains("null"))
+//         {
+//             Console.WriteLine("Success");
+//             return Task.CompletedTask;
+//         }
+//         var tradeDataList = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+
+//         return Task.CompletedTask;
+//     }, CancellationToken.None);
+// await binanceWebSocket.ConnectAsync(new string[] { "btcusdt@aggTrade" }, CancellationToken.None);
+
 var bybitWebSocket = new ExchangesWebSocket(
     logger: log,
     handler: new BybitWebSocketHandler());
