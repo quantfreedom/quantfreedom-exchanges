@@ -1,6 +1,6 @@
 using System;
 
-namespace Exchanges.Constants;
+namespace Models.Bybit;
 
 public class BybitConstants
 {

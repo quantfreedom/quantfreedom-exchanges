@@ -34,45 +34,60 @@ using var log = new LoggerConfiguration()
 //       useTestnet: true
 //       );
 
-// var binanceWebSocket = new ExchangesWebSocket(
-//     logger: log,
-//     handler: new BinanceWebSocketHandler());
-// binanceWebSocket.OnMessageReceived(
-//     (data) =>
-//     {
-//         if (data.Contains("null"))
-//         {
-//             Console.WriteLine("Success");
-//             return Task.CompletedTask;
-//         }
-//         var tradeDataList = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
-
-//         return Task.CompletedTask;
-//     }, CancellationToken.None);
-// await binanceWebSocket.ConnectAsync(new string[] { "btcusdt@aggTrade" }, CancellationToken.None);
-
-var bybitWebSocket = new ExchangesWebSocket(
-    logger: log,
-    handler: new BybitWebSocketHandler());
-bybitWebSocket.OnMessageReceived(
+var binanceWebSocket = new BinanceWebSocket(logger: log);
+binanceWebSocket.OnMessageReceived(
     (data) =>
     {
-        if (data.Contains("success"))
+        if (data.Contains("success") || data.Contains("pong") || data.Contains("null"))
         {
+            log.Debug("Success");
             Console.WriteLine("Success");
             return Task.CompletedTask;
         }
-        var parsedData = bybitWebSocket.TradeStreamParser(data);
+        var parsedData = binanceWebSocket.TradeStreamParser(data);
         foreach (var item in parsedData)
         {
-            if (item.UsdtQty > 100_000)
+            log.Debug($"Trade Data looping through parsedData UsdtQty= {item.UsdtQty}");
+            if (item.UsdtQty > 50_000)
             {
-                var serializedTrade = JsonConvert.SerializeObject(item, Formatting.Indented);
-                Console.WriteLine("Trade Data: \n" + serializedTrade + "\n");
+                try
+                {
+                    var serializedTrade = JsonConvert.SerializeObject(item, Formatting.Indented);
+                    log.Information("Trade Data: \n" + serializedTrade + "\n");
+                    Console.WriteLine("Trade Data: \n" + serializedTrade + "\n");
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, "Error serializing trade data");
+                    Console.WriteLine($"{ex} Error serializing trade data");
+                }
+
             }
         }
         return Task.CompletedTask;
     }, CancellationToken.None);
-await bybitWebSocket.ConnectAsync(new string[] { "publicTrade.BTCUSDT" }, CancellationToken.None);
+await binanceWebSocket.ConnectAsync(CancellationToken.None);
+
+// var bybitWebSocket = new BybitWebSocket(logger: log);
+// bybitWebSocket.OnMessageReceived(
+//     (data) =>
+//     {
+//         if (data.Contains("success"))
+//         {
+//             Console.WriteLine("Success");
+//             return Task.CompletedTask;
+//         }
+//         var parsedData = bybitWebSocket.TradeStreamParser(data);
+//         foreach (var item in parsedData)
+//         {
+//             if (item.UsdtQty > 100_000)
+//             {
+//                 var serializedTrade = JsonConvert.SerializeObject(item, Formatting.Indented);
+//                 Console.WriteLine("Trade Data: \n" + serializedTrade + "\n");
+//             }
+//         }
+//         return Task.CompletedTask;
+//     }, CancellationToken.None);
+// await bybitWebSocket.ConnectAsync(CancellationToken.None);
 Console.WriteLine("Press 'q' to quit the application.");
 while (true) { }

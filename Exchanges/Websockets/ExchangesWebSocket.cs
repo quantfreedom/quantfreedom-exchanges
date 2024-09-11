@@ -1,7 +1,5 @@
-using System;
 using System.Net.WebSockets;
 using System.Text;
-using Exchanges.Exceptions;
 using Exchnages.Utils;
 using Models.Bybit;
 using Models.Exchange;
@@ -10,42 +8,31 @@ using Serilog.Core;
 
 namespace Exchanges.Websockets;
 
-public class ExchangesWebSocket : IDisposable
+public abstract class ExchangesWebSocket
 {
-    protected readonly Logger _logger;
-    private readonly IExchangesWebSocketHandler Handler;
-    private readonly List<Func<string, Task>> OnMessageReceivedFunctions;
-    private readonly List<CancellationTokenRegistration> OnMessageReceivedCancellationTokenRegistrations;
+    public readonly Logger _logger;
+    private readonly string WsUrl;
+    private readonly List<Func<string, Task>> OnMessageReceivedFunctions = new();
+    private readonly List<CancellationTokenRegistration> OnMessageReceivedCancellationTokenRegistrations = new();
     private CancellationTokenSource? loopCancellationTokenSource;
-    private readonly int PingInterval;
-    private readonly int ReceiveBufferSize;
+    private readonly int PingInterval = 20;
+    private readonly int ReceiveBufferSize = 262_144;
+    private readonly ClientWebSocket WebSocket = new();
+    public abstract Dictionary<string, object> CreateSubscriptionMessage();
 
-    public ExchangesWebSocket(
-        Logger logger,
-        IExchangesWebSocketHandler handler,
-        int pingInterval = 20,
-        int receiveBufferSize = 262_144 // TODO figure out some type of way to keep looping until we get the full message
-    )
+
+    public ExchangesWebSocket(Logger logger, string wsUrl) { this._logger = logger; this.WsUrl = wsUrl; }
+    public async Task ConnectAsync(CancellationToken cancellationToken)
     {
-        this._logger = logger;
-        this.Handler = handler;
-        this.Handler._logger = logger;
-        this.ReceiveBufferSize = receiveBufferSize;
-        this.PingInterval = pingInterval;
-        this.OnMessageReceivedFunctions = new List<Func<string, Task>>();
-        this.OnMessageReceivedCancellationTokenRegistrations = new List<CancellationTokenRegistration>();
-    }
-    public async Task ConnectAsync(string[] args, CancellationToken cancellationToken)
-    {
-        if (this.Handler.State != WebSocketState.Open)
+        if (this.WebSocket.State != WebSocketState.Open)
         {
             this.loopCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            await Handler.ConnectAsync(new Uri(this.Handler.WsUrl), cancellationToken);
+            await this.WebSocket.ConnectAsync(new Uri(this.WsUrl), cancellationToken);
 
             _ = Task.Run(() => Ping(this.loopCancellationTokenSource.Token), cancellationToken);
 
-            await SendSubscription(args);
+            await SendSubscription();
             await Task.Factory.StartNew(() => this.ReceiveLoop(this.loopCancellationTokenSource.Token, this.ReceiveBufferSize),
                 this.loopCancellationTokenSource.Token,
                 TaskCreationOptions.LongRunning,
@@ -68,9 +55,11 @@ public class ExchangesWebSocket : IDisposable
     {
         while (!token.IsCancellationRequested)
         {
+            _logger.Debug("Ping loop");
             await Task.Delay(TimeSpan.FromSeconds(this.PingInterval), token);
-            if (this.Handler.State == WebSocketState.Open)
+            if (this.WebSocket.State == WebSocketState.Open)
             {
+                _logger.Debug("Sending ping");
                 await SendAsync("{\"op\":\"ping\"}", CancellationToken.None);
                 await Console.Out.WriteLineAsync("ping sent");
             }
@@ -80,12 +69,11 @@ public class ExchangesWebSocket : IDisposable
     {
         byte[] byteArray = Encoding.ASCII.GetBytes(message);
 
-        await this.Handler.SendAsync(new ArraySegment<byte>(byteArray), WebSocketMessageType.Text, true, cancellationToken);
+        await this.WebSocket.SendAsync(new ArraySegment<byte>(byteArray), WebSocketMessageType.Text, true, cancellationToken);
     }
-    private async Task SendSubscription(string[] args)
+    private async Task SendSubscription()
     {
-        ExchangeUtils.EnsureNoDuplicates(args);
-        var subMessage = this.Handler.CreateSubscriptionMessage(args);
+        var subMessage = this.CreateSubscriptionMessage();
         string subMessageJson = JsonConvert.SerializeObject(subMessage);
 
         await Console.Out.WriteLineAsync($"send subscription {subMessageJson}");
@@ -99,7 +87,7 @@ public class ExchangesWebSocket : IDisposable
             while (!cancellationToken.IsCancellationRequested)
             {
                 var buffer = new ArraySegment<byte>(new byte[receiveBufferSize]);
-                receiveResult = await this.Handler.ReceiveAsync(buffer, cancellationToken);
+                receiveResult = await this.WebSocket.ReceiveAsync(buffer, cancellationToken);
                 var resized = new byte[buffer.Count];
                 Array.Copy(buffer.Array, buffer.Offset, resized, 0, buffer.Count);
 
@@ -117,21 +105,26 @@ public class ExchangesWebSocket : IDisposable
             await this.DisconnectAsync(CancellationToken.None);
         }
     }
-    public async Task DisconnectAsync(CancellationToken cancellationToken)
+    public async Task DisconnectAsync(
+        CancellationToken cancellationToken,
+        string? statusDescription = null)
     {
         this.loopCancellationTokenSource?.Cancel();
 
-        if (this.Handler.State == WebSocketState.Open)
+        if (this.WebSocket.State == WebSocketState.Open)
         {
-            await this.Handler.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, cancellationToken);
-            await this.Handler.CloseAsync(WebSocketCloseStatus.NormalClosure, cancellationToken);
+            await this.WebSocket.CloseOutputAsync(
+                WebSocketCloseStatus.NormalClosure,
+                statusDescription,
+                cancellationToken);
+            await this.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, statusDescription, cancellationToken);
         }
     }
     public void Dispose()
     {
         this.DisconnectAsync(CancellationToken.None).Wait();
 
-        this.Handler.Dispose();
+        this.WebSocket.Dispose();
 
         this.OnMessageReceivedCancellationTokenRegistrations.ForEach(ct => ct.Dispose());
 
@@ -139,36 +132,6 @@ public class ExchangesWebSocket : IDisposable
             this.loopCancellationTokenSource.Dispose();
     }
 
-    public List<ExchangeWsTradeDataParsed> TradeStreamParser(string receivedMessage)
-    {
-        var (tradeDataList, exchange) = this.Handler.GetTradeList(receivedMessage);
-        var parsedData = WsTradeParseModel(tradeDataList, exchange);
-        return parsedData;
-    }
-    private List<ExchangeWsTradeDataParsed> WsTradeParseModel(List<ExchangeWsTradeData> tradeDataList, string exchange)
-    {
-        var parsedData = tradeDataList
-            .GroupBy(t => new { Price = t.price, Time = t.timestamp, Side = t.side })
-            .Select(t =>
-            {
-                var assetQty = t.Sum(x => x.assetQty);
-                var price = t.Key.Price;
-                var timestamp = t.Key.Time;
-                var side = t.Key.Side == "Buy" ? "Buyer" : "Seller";
-
-                return new ExchangeWsTradeDataParsed
-                {
-                    Exchange = exchange,
-                    Timestamp = timestamp,
-                    AssetQty = assetQty,
-                    Price = price,
-                    Side = side,
-                    UsdtQty = assetQty * price
-                };
-            })
-            .ToList();
-        return parsedData;
-    }
 
 
 }

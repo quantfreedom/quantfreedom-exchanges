@@ -3,30 +3,53 @@ using Newtonsoft.Json;
 
 namespace Models.Binance;
 
-public class BinanceWsTradeData 
+public class BinanceWsTradeData
 {
+
+
     [JsonProperty("E")]
-    public string timestamp
+    public long Timestamp
     {
         get; set;
     }
     [JsonProperty("s")]
-    public string symbol
+    public string Symbol
     {
         get; set;
     }
     [JsonProperty("p")]
-    public decimal price
+    public decimal Price
     {
         get; set;
     }
     [JsonProperty("q")]
-    public decimal assetQty
+    public decimal AssetQty
     {
         get; set;
     }
     [JsonProperty("m")]
-    public bool side
+    public bool Side
+    {
+        get; set;
+    }
+
+    [JsonProperty("e")]
+    public string EventType
+    {
+        get; set;
+    }
+    [JsonProperty("a")]
+    public long AggregateTradeId
+    {
+        get; set;
+    }
+    [JsonProperty("f")]
+    public long FirstTradeId
+    {
+        get; set;
+    }
+    [JsonProperty("l")]
+    public long LastTradeId
     {
         get; set;
     }

@@ -6,6 +6,10 @@ namespace Models.Exchange;
 
 public class ExchangeWsTradeDataParsed
 {
+    public string Datetime
+    {
+        get; set;
+    }
     public string Exchange
     {
         get; set;
